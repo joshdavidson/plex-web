@@ -1,17 +1,17 @@
 {% extends "layout.html.jinja" %}
 
 {% block title %}
-- Playlists
+- Collections
 {% endblock %}
 
 {% block main %}
 
-<h1 class="display-4">Playlist</h1>
+<h1 class="display-4">Collections</h1>
 
 <br>
 
 <p class="lead">
-    All playlists connected to the owner of the plex server. Press a playlist to get a table with all movies on the playlist.
+    All collections from plex server. Click a collection to get a table with all movies in the collection.
 </p>
 
 <br>
@@ -20,16 +20,16 @@
     <div class="col-4">
 
         <div class="list-group" id="list-tab" role="tablist">
-            {% for playlist in playlists %}
-            <a class="list-group-item list-group-item-action" data-toggle="list" id="{{playlist.id}}-button"
-                href="#{{playlist.id}}" role="tab" onClick="contentPlaylistResults(this)">{{playlist.title}}</a>
+            {% for collection in collections %}
+            <a class="list-group-item list-group-item-action" data-toggle="list" id="{{collection.id}}-button"
+                href="#{{collection.id}}" role="tab" onClick="contentCollectionResults(this)">{{collection.title}}</a>
             {% endfor %}
         </div>
     </div>
     <div class="col-8">
         <div class="tab-content" id="nav-tabContent">
-            {% for playlist in playlists %}
-            <div class="tab-pane" id="{{playlist.id}}" role="tabpanel">
+            {% for collection in collections %}
+            <div class="tab-pane" id="{{collection.id}}" role="tabpanel">
                 <div class="d-flex justify-content-center">
                     <div class="spinner-border" role="status">
                         <span class="sr-only">Loading...</span>
@@ -42,6 +42,5 @@
     </div>
 </div>
 </div>
-
 
 {% endblock %}

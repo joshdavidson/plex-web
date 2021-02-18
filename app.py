@@ -1,12 +1,12 @@
-from flask import Flask, jsonify, redirect, render_template, request, session, url_for
-from tempfile import mkdtemp
-from helpers import get_users, check_server, check_activity, get_movies, get_playlists, get_playlist_movies, login_required, get_sections
-from playlist import add_playlist_to_plex
-from plexapi.server import PlexServer
-import json
 import traceback
 
-# init flask
+from flask import Flask, render_template, redirect, request, session, jsonify
+from helpers import login_required, get_sections, get_users, get_playlists, check_activity, check_server, get_movies, \
+    get_playlist_movies, get_collections, get_collection_movies
+import json
+
+from playlist import add_playlist_to_plex
+
 app = Flask(__name__)
 
 # configurations for session
@@ -16,7 +16,6 @@ app.config["SESSION_PERMANENT"] = False
 
 @app.route("/connect", methods=["GET", "POST"])
 def connect():
-
     if request.method == "GET":
         return render_template("connect.html.jinja")
     else:
@@ -50,16 +49,26 @@ def server():
     return render_template("server.html.jinja", users=users)
 
 
+@app.route('/collections')
+@login_required
+def collections():
+    plex_collections = get_collections(session["plex_url"], session["plex_token"])
+    collections = []
+    for i, p_list in enumerate(plex_collections):
+        collections.append({"title": p_list.title,
+                            "id": f'collection-{i}',
+                            })
+    return render_template("collections.html.jinja", collections=collections)
+
+
 @app.route('/playlists')
 @login_required
 def playlists():
-
     plex_playlists = get_playlists(session["plex_url"], session["plex_token"])
 
     playlists = []
 
     for i, p_list in enumerate(plex_playlists):
-
         playlists.append({"title": p_list.title,
                           "id": f'playlist-{i}',
                           })
@@ -70,14 +79,13 @@ def playlists():
 @app.route('/addplaylist')
 @login_required
 def addplaylist():
-
     sections = get_sections(session["plex_url"], session["plex_token"])
     users = get_users(session["plex_url"], session["plex_token"])
 
     data = {"sections": sections,
             "users": users}
 
-    return render_template('addplaylist.html', data=data)
+    return render_template('addplaylist.html.jinja', data=data)
 
 
 @app.route('/disconnect')
@@ -120,13 +128,22 @@ def search():
     return jsonify(movies=movies)
 
 
+@app.route('/collectiondata', methods=["GET"])
+def collectiondata():
+    collection = request.args.get("collection")
+    movies = get_collection_movies(
+        session["plex_url"], session["plex_token"], collection)
+    movies_json = jsonify(movies)
+    return movies_json
+
+
 @app.route('/playdata', methods=["GET"])
 def playdata():
     playlist = request.args.get("playlist")
     movies = get_playlist_movies(
         session["plex_url"], session["plex_token"], playlist)
-
-    return jsonify(movies)
+    movies_json = jsonify(movies)
+    return movies_json
 
 
 @app.route('/addplaylisttoplex', methods=["POST"])
@@ -159,3 +176,7 @@ def addplaylisttoplex():
         print(traceback.print_exc())
 
     return jsonify(data)
+
+
+if __name__ == '__main__':
+    app.run(debug=False)
