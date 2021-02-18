@@ -63,6 +63,7 @@ $ pip3 install -r requirements.txt
 # Run flask server
 $ flask run
 ```
+## 
 ## ✔️ Features
 
 * Sign in to your Plex server.
@@ -89,9 +90,13 @@ This project was based on **lack of playlists in Plex**. When you have a movie l
 The other features of the web app are just neat implementations that enhances the management of playlists.
 
 ## :whale: Docker
-[christronyxyocum](https://github.com/christronyxyocum) created a Docker image which can be accessed [here](https://hub.docker.com/r/tronyx/plex-web).
+Docker image can be accessed [here](https://hub.docker.com/r/joshdavidson/plex-web).
 
-Github link [here](https://github.com/christronyxyocum/docker-plex-web).
+To run the Docker image:
+```bash 
+docker run -d --name plex-web -p 5000:5000 joshdavidson/plex-web
+```
+
 
 
 ## 🔧 Contributing
